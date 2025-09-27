@@ -7,36 +7,43 @@ interface FilterBarProps {
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({ filter, setFilter }) => (
-  <div className="flex justify-center gap-2 mb-6">
-    <button
-      className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-        filter === 'all' 
-          ? 'bg-white text-purple-600 shadow-lg' 
-          : 'bg-white/20 text-white hover:bg-white/30'
-      }`}
-      onClick={() => setFilter('all')}
-    >
-      🌟 All
-    </button>
-    <button
-      className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-        filter === 'incomplete' 
-          ? 'bg-white text-purple-600 shadow-lg' 
-          : 'bg-white/20 text-white hover:bg-white/30'
-      }`}
-      onClick={() => setFilter('incomplete')}
-    >
-      ⏳ Active
-    </button>
-    <button
-      className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-        filter === 'completed' 
-          ? 'bg-white text-purple-600 shadow-lg' 
-          : 'bg-white/20 text-white hover:bg-white/30'
-      }`}
-      onClick={() => setFilter('completed')}
-    >
-      ✅ Done
-    </button>
+  <div className="flex justify-center gap-4 mb-8">
+    <div className="glass-effect rounded-2xl p-2 backdrop-blur-2xl">
+      <div className="flex gap-2">
+        <button
+          className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
+            filter === 'all' 
+              ? 'bg-white text-purple-600 shadow-lg neon-glow transform scale-105' 
+              : 'text-white hover:bg-white/20 hover:scale-105'
+          }`}
+          onClick={() => setFilter('all')}
+        >
+          <span className="text-lg">🌟</span>
+          <span>すべて</span>
+        </button>
+        <button
+          className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
+            filter === 'incomplete' 
+              ? 'bg-white text-purple-600 shadow-lg neon-glow transform scale-105' 
+              : 'text-white hover:bg-white/20 hover:scale-105'
+          }`}
+          onClick={() => setFilter('incomplete')}
+        >
+          <span className="text-lg">⚡</span>
+          <span>進行中</span>
+        </button>
+        <button
+          className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
+            filter === 'completed' 
+              ? 'bg-white text-purple-600 shadow-lg neon-glow transform scale-105' 
+              : 'text-white hover:bg-white/20 hover:scale-105'
+          }`}
+          onClick={() => setFilter('completed')}
+        >
+          <span className="text-lg">✅</span>
+          <span>完了</span>
+        </button>
+      </div>
+    </div>
   </div>
 );

@@ -10,7 +10,12 @@ export function useTasks() {
   }, [tasks]);
 
   const addTask = (task: Task) => {
-    setTasks(prev => [...prev, task]);
+    console.log('useTasks: Adding task:', task);
+    setTasks(prev => {
+      const newTasks = [...prev, task];
+      console.log('useTasks: New tasks array:', newTasks);
+      return newTasks;
+    });
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
