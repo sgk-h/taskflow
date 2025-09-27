@@ -69,6 +69,175 @@
 
 ---
 
+## System Design & Architecture
+
+### System Architecture
+```mermaid
+graph LR
+    A[User] --> B[Web Browser]
+    B --> C[React Application]
+    C --> D[Component Layer]
+    C --> E[Custom Hooks]
+    C --> F[Utility Layer]
+    E --> G[LocalStorage API]
+    F --> G
+    
+    subgraph "Frontend Architecture"
+        D
+        E
+        F
+    end
+    
+    subgraph "Data Persistence"
+        G
+    end
+```
+
+### Data Flow Sequence
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as TaskForm
+    participant H as useTasks Hook
+    participant S as LocalStorage
+    participant L as TaskList
+
+    Note over U,L: タスク追加フロー
+    U->>UI: タスクタイトル入力
+    U->>UI: 優先度選択
+    U->>UI: "追加"ボタンクリック
+    UI->>H: addTask(taskData)
+    H->>H: generateId()
+    H->>H: validateTask()
+    H->>S: saveTasks(updatedTasks)
+    S-->>H: 保存完了
+    H-->>L: tasks state更新
+    L-->>U: 新しいタスクを表示
+    
+    Note over U,L: タスク完了フロー
+    U->>L: チェックボックスクリック
+    L->>H: toggleComplete(taskId)
+    H->>H: updateTaskStatus()
+    H->>S: saveTasks(updatedTasks)
+    S-->>H: 保存完了
+    H-->>L: tasks state更新
+    L-->>U: 完了状態を表示
+```
+
+### Data Model
+```mermaid
+classDiagram
+    class Task {
+        +string id
+        +string title
+        +string description?
+        +boolean completed
+        +Priority priority
+        +string category?
+        +Date createdAt
+        +Date updatedAt
+        +validate() boolean
+    }
+    
+    class Priority {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+    }
+    
+    class TaskFilter {
+        <<enumeration>>
+        ALL
+        COMPLETED
+        INCOMPLETE
+    }
+    
+    class TaskFormData {
+        +string title
+        +string description
+        +Priority priority
+        +string category
+    }
+    
+    class TaskState {
+        +Task[] tasks
+        +TaskFilter filter
+        +addTask(TaskFormData) void
+        +deleteTask(string) void
+        +toggleComplete(string) void
+        +updateTask(string, TaskFormData) void
+    }
+    
+    Task ||--|| Priority : has
+    TaskFormData ||--|| Priority : specifies
+    TaskState ||--o{ Task : manages
+    TaskState ||--|| TaskFilter : applies
+```
+
+### Component Hierarchy
+```mermaid
+graph TD
+    A[App.tsx] --> B[Header.tsx]
+    A --> C[TaskForm.tsx]
+    A --> D[FilterBar.tsx]  
+    A --> E[TaskList.tsx]
+    E --> F[TaskItem.tsx]
+    
+    A --> G[useTasks Hook]
+    A --> H[useLocalStorage Hook]
+    C --> I[useForm Hook]
+    G --> J[storage.ts]
+    G --> K[validation.ts]
+    J --> L[LocalStorage API]
+    
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style G fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style H fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style I fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style J fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style K fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+```
+
+### User Interaction Flow
+```mermaid
+flowchart TD
+    START([ユーザーがアプリにアクセス]) --> LOAD{既存タスクの有無}
+    LOAD -->|あり| DISPLAY[タスクリスト表示]
+    LOAD -->|なし| EMPTY[空のリスト表示]
+    
+    DISPLAY --> ACTION{ユーザーアクション}
+    EMPTY --> ACTION
+    
+    ACTION -->|新規追加| FORM[TaskForm入力]
+    ACTION -->|完了切替| TOGGLE[toggleComplete実行]
+    ACTION -->|削除| DELETE[削除確認→deleteTask実行]
+    ACTION -->|フィルター| FILTER[FilterBar選択]
+    ACTION -->|編集| EDIT[TaskForm編集モード]
+    
+    FORM --> VALIDATE{入力値検証}
+    VALIDATE -->|OK| ADD[addTask実行]
+    VALIDATE -->|NG| ERROR[エラーメッセージ表示]
+    
+    ADD --> SAVE[LocalStorage保存]
+    TOGGLE --> SAVE
+    DELETE --> SAVE
+    EDIT --> SAVE
+    
+    SAVE --> REFRESH[UI更新]
+    FILTER --> REFRESH
+    ERROR --> FORM
+    
+    REFRESH --> DISPLAY
+    
+    style START fill:#e8f5e8
+    style SAVE fill:#fff3cd
+    style ERROR fill:#f8d7da
+    style REFRESH fill:#d1ecf1
+```
+
+---
+
 ## Non-Functional Requirements
 
 ### Performance Requirements
